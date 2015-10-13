@@ -12,13 +12,17 @@ namespace security
         {
             services.AddAuthentication();
             
+            // OPTIONAL: Use a custom authorization handler to implement resource-based
+            // authorization in the application.
+            // services.AddTransient<IAuthorizationHandler,AdminUserHandler>();
+            
             // The authorization for the application is defined in a number of policies.
             // Each policy defines what the user has to comply to in order to get access.
             services.AddAuthorization(authorization => {
                 authorization.AddPolicy("Anonymous", policy =>  policy.RequireDelegate((context,requirement) => {
                     // When none of the identities are authenticated the user is anonymous.
                     // So the requirement was succesful.
-                    if(context.User.Identities.All(identity=> !identity.IsAuthenticated)) {
+                    if(context.User.Identities.All(identity => !identity.IsAuthenticated)) {
                         context.Succeed(requirement);    
                     } else {
                         context.Fail();
@@ -42,13 +46,13 @@ namespace security
                 options.AutomaticAuthentication = true;
                 options.LoginPath = "/Account/Logon";
                 options.LogoutPath = "/Account/Logoff";
-            });
-
+            });      
+            
             app.UseMvc(routes => {
                 routes.MapRoute("DefaultRoute",
                     "{controller}/{action}/{id?}",
                     new { controller = "Home", action = "Index"});
-            });  
+            });
         }
     }
 }
